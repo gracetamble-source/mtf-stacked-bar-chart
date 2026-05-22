@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>MTF Tier Distribution</title>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: white;
+    }
+
+    svg {
+      width: 100%;
+      max-width: 1100px;
+      height: 650px;
+      display: block;
+    }
+
+    .axis text {
+      font-size: 13px;
+      fill: #222;
+    }
+
+    .x-axis path {
+      stroke: #444;
+      stroke-width: 1;
+    }
+
+    .x-axis line {
+      stroke: #444;
+      stroke-width: 1;
+    }
+
+    .y-axis path,
+    .y-axis line {
+      display: none;
+    }
+
+    .country-label {
+      font-size: 16px;
+      fill: #111;
+    }
+
+    .tier-segment {
+      cursor: pointer;
+    }
+
+    .tier-segment:hover {
+      opacity: 0.85;
+    }
+
+    .axis-label {
+      font-size: 16px;
+      font-style: italic;
+      fill: #111;
+    }
+
+    .legend text {
+      font-size: 16px;
+      fill: #111;
+    }
+
+    .tooltip {
+      position: absolute;
+      background: white;
+      border: 1px solid #ccc;
+      padding: 8px 10px;
+      font-size: 13px;
+      pointer-events: none;
+      opacity: 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+  </style>
+</head>
+
+<body>
+
+<svg width="1100" height="650"></svg>
+<div class="tooltip"></div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
