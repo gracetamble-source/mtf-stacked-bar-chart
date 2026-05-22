@@ -6,74 +6,80 @@
   <script src="https://d3js.org/d3.v7.min.js"></script>
 
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      background: white;
-    }
 
-    svg {
-      width: 100%;
-      max-width: 1100px;
-      height: 650px;
-      display: block;
-    }
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background: white;
+    color: #2E5C73;
+  }
 
-    .axis text {
-      font-size: 13px;
-      fill: #222;
-    }
+  svg {
+    width: 100%;
+    max-width: 1100px;
+    height: 650px;
+    display: block;
+  }
 
-    .x-axis path {
-      stroke: #444;
-      stroke-width: 1;
-    }
+  .axis text {
+    font-size: 13px;
+    fill: #2E5C73;
+  }
 
-    .x-axis line {
-      stroke: #444;
-      stroke-width: 1;
-    }
+  .x-axis path {
+    stroke: #2E5C73;
+    stroke-width: 1;
+  }
 
-    .y-axis path,
-    .y-axis line {
-      display: none;
-    }
+  .x-axis line {
+    stroke: #2E5C73;
+    stroke-width: 1;
+  }
 
-    .country-label {
-      font-size: 16px;
-      fill: #111;
-    }
+  .y-axis path,
+  .y-axis line {
+    display: none;
+  }
 
-    .tier-segment {
-      cursor: pointer;
-    }
+  .country-label {
+    font-size: 18px;
+    fill: #2E5C73;
+    font-weight: 500;
+  }
 
-    .tier-segment:hover {
-      opacity: 0.85;
-    }
+  .tier-segment {
+    cursor: pointer;
+  }
 
-    .axis-label {
-      font-size: 16px;
-      font-style: italic;
-      fill: #111;
-    }
+  .tier-segment:hover {
+    opacity: 0.85;
+  }
 
-    .legend text {
-      font-size: 16px;
-      fill: #111;
-    }
+  .axis-label {
+    font-size: 16px;
+    font-style: italic;
+    fill: #2E5C73;
+  }
 
-    .tooltip {
-      position: absolute;
-      background: white;
-      border: 1px solid #ccc;
-      padding: 8px 10px;
-      font-size: 13px;
-      pointer-events: none;
-      opacity: 0;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-    }
-  </style>
+  .legend text {
+    font-size: 16px;
+    fill: #2E5C73;
+    font-weight: 500;
+  }
+
+  .tooltip {
+    position: absolute;
+    background: white;
+    border: 1px solid #ccc;
+    padding: 8px 10px;
+    font-size: 13px;
+    pointer-events: none;
+    opacity: 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    color: #2E5C73;
+  }
+
+</style>
 </head>
 
 <body>
