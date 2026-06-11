@@ -68,31 +68,40 @@ function normalizeTierShares(d) {
   return rawValues;
 }
 
-function renderCountryOptions() {
-  const availableKeys = new Set(rows
-    .filter(d => d.year === selectedYear)
-    .map(d => d.countryKey));
+function normalizeSearch(value) {
+  return String(value || "")
+    .trim()
+    .toLowerCase();
+}
 
+function renderCountryOptions() {
   const isAtLimit = selectedCountries.length >= maxCountries;
-  const searchTerm = countrySearchTerm.trim().toLowerCase();
-  const countries = isAtLimit || !searchTerm ? [] : rows
-    .filter(d => availableKeys.has(d.countryKey))
-    .filter((d, index, array) => array.findIndex(item => item.countryKey === d.countryKey) === index)
-    .filter(d => !selectedCountries.includes(d.countryKey))
-    .filter(d => d.countryName.toLowerCase().includes(searchTerm))
-    .sort((a, b) => d3.ascending(a.countryName, b.countryName))
-    .slice(0, 8);
+  const query = normalizeSearch(countrySearchTerm);
+  const allCountriesForSelectedYear = Array.from(
+    d3.group(
+      rows.filter(d => d.year === selectedYear),
+      d => d.countryKey
+    ).values(),
+    group => group[0]
+  ).sort((a, b) => d3.ascending(a.countryName, b.countryName));
+
+  const searchResults = query && !isAtLimit
+    ? allCountriesForSelectedYear
+      .filter(d => !selectedCountries.includes(d.countryKey))
+      .filter(d => normalizeSearch(d.countryName).includes(query))
+      .slice(0, 8)
+    : [];
 
   d3.select("#country-search")
     .property("disabled", false)
     .property("value", countrySearchTerm);
 
   const results = d3.select("#country-results")
-    .classed("is-visible", Boolean(searchTerm) && !isAtLimit);
+    .classed("is-visible", Boolean(query) && !isAtLimit);
 
   const options = results
     .selectAll(".country-option-button")
-    .data(countries, d => d.countryKey);
+    .data(searchResults, d => d.countryKey);
 
   options.exit().remove();
 
@@ -115,7 +124,7 @@ function renderCountryOptions() {
 
   const noResults = results
     .selectAll(".no-results")
-    .data(searchTerm && !isAtLimit && !countries.length ? [null] : []);
+    .data(query && !isAtLimit && !searchResults.length ? [null] : []);
 
   noResults.exit().remove();
 
@@ -123,6 +132,11 @@ function renderCountryOptions() {
     .append("p")
     .attr("class", "helper-text no-results")
     .text("No matching countries.");
+}
+
+function handleCountrySearch(event) {
+  countrySearchTerm = event.target.value;
+  renderCountryOptions();
 }
 
 function renderLegend() {
@@ -308,11 +322,6 @@ function update() {
   renderCountryOptions();
   updateStatusText(missingCount);
   drawChart(chartData);
-}
-
-function handleCountrySearch(event) {
-  countrySearchTerm = event.target.value;
-  renderCountryOptions();
 }
 
 d3.csv(dataFile).then(data => {
