@@ -74,11 +74,12 @@ function renderCountryOptions() {
     .map(d => d.countryKey));
 
   const isAtLimit = selectedCountries.length >= maxCountries;
-  const countries = isAtLimit ? [] : rows
+  const searchTerm = countrySearchTerm.trim().toLowerCase();
+  const countries = isAtLimit || !searchTerm ? [] : rows
     .filter(d => availableKeys.has(d.countryKey))
     .filter((d, index, array) => array.findIndex(item => item.countryKey === d.countryKey) === index)
     .filter(d => !selectedCountries.includes(d.countryKey))
-    .filter(d => d.countryName.toLowerCase().includes(countrySearchTerm.toLowerCase()))
+    .filter(d => d.countryName.toLowerCase().includes(searchTerm))
     .sort((a, b) => d3.ascending(a.countryName, b.countryName))
     .slice(0, 8);
 
@@ -86,7 +87,10 @@ function renderCountryOptions() {
     .property("disabled", false)
     .property("value", countrySearchTerm);
 
-  const options = d3.select("#country-results")
+  const results = d3.select("#country-results")
+    .classed("is-visible", Boolean(searchTerm) && !isAtLimit);
+
+  const options = results
     .selectAll(".country-option-button")
     .data(countries, d => d.countryKey);
 
@@ -108,6 +112,17 @@ function renderCountryOptions() {
     })
     .merge(options)
     .text(d => d.countryName);
+
+  const noResults = results
+    .selectAll(".no-results")
+    .data(searchTerm && !isAtLimit && !countries.length ? [null] : []);
+
+  noResults.exit().remove();
+
+  noResults.enter()
+    .append("p")
+    .attr("class", "helper-text no-results")
+    .text("No matching countries.");
 }
 
 function renderLegend() {
@@ -295,6 +310,11 @@ function update() {
   drawChart(chartData);
 }
 
+function handleCountrySearch(event) {
+  countrySearchTerm = event.target.value;
+  renderCountryOptions();
+}
+
 d3.csv(dataFile).then(data => {
   rows = data.map(d => {
     const values = normalizeTierShares(d);
@@ -332,10 +352,10 @@ d3.csv(dataFile).then(data => {
     });
 
   d3.select("#country-search")
-    .on("input", event => {
-      countrySearchTerm = event.target.value;
-      renderCountryOptions();
-    });
+    .on("input", handleCountrySearch)
+    .on("keyup", handleCountrySearch)
+    .on("change", handleCountrySearch)
+    .on("search", handleCountrySearch);
 
   renderLegend();
   update();
