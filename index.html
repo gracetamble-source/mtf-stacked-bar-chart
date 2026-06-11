@@ -31,7 +31,6 @@
 
     .control-panel,
     .chart-card {
-      background: white;
       border: 1px solid #e1ebef;
       border-radius: 8px;
       color: #2E5C73;
@@ -39,23 +38,16 @@
     }
 
     .control-panel {
+      background: #f3f7f9;
       min-height: 520px;
       padding: 20px 18px;
       display: flex;
       flex-direction: column;
     }
 
-    .panel-title {
-      margin: 0 0 18px;
-      font-size: 20px;
-      line-height: 1.15;
-      font-weight: 800;
-    }
-
     .control-group {
       display: grid;
       gap: 7px;
-      margin-bottom: 14px;
     }
 
     label {
@@ -63,7 +55,8 @@
       font-weight: 700;
     }
 
-    select {
+    select,
+    input[type="search"] {
       width: 100%;
       min-height: 36px;
       padding: 7px 10px;
@@ -74,9 +67,44 @@
       background: white;
     }
 
-    select:disabled {
+    select:disabled,
+    input[type="search"]:disabled {
       color: #8299a4;
       background: #f7fafb;
+    }
+
+    input[type="search"]::placeholder {
+      color: #6d8795;
+    }
+
+    .country-results {
+      display: grid;
+      align-content: start;
+      gap: 4px;
+      min-height: 154px;
+      max-height: 154px;
+      overflow-y: auto;
+      padding-right: 2px;
+    }
+
+    .country-option-button {
+      width: 100%;
+      min-height: 28px;
+      padding: 5px 8px;
+      border: 1px solid #cbd9df;
+      border-radius: 4px;
+      background: white;
+      color: #2E5C73;
+      font-size: 13px;
+      line-height: 1.2;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .country-option-button:hover,
+    .country-option-button:focus-visible {
+      border-color: #9fb3bd;
+      background: #f8fbfc;
     }
 
     .helper-text,
@@ -93,8 +121,10 @@
 
     .selected-list {
       display: grid;
+      align-content: start;
       gap: 6px;
       margin: 10px 0 8px;
+      min-height: 354px;
     }
 
     .country-chip {
@@ -127,14 +157,58 @@
     }
 
     .remove-country:focus-visible,
-    select:focus-visible {
+    select:focus-visible,
+    input[type="search"]:focus-visible {
       outline: 2px solid #7ea4b7;
       outline-offset: 2px;
     }
 
+    .panel-divider {
+      height: 1px;
+      margin: 18px 0;
+      background: #dbe7eb;
+      flex: 0 0 auto;
+    }
+
+    .legend-title {
+      margin: 0 0 4px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #2E5C73;
+    }
+
+    .legend-subtitle {
+      margin: 0 0 14px;
+      font-size: 12px;
+      color: #2E5C73;
+      font-style: italic;
+    }
+
+    .legend-list {
+      display: grid;
+      gap: 10px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .legend-list li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      line-height: 1.25;
+      color: #2E5C73;
+    }
+
+    .legend-swatch {
+      width: 17px;
+      height: 17px;
+      flex: 0 0 17px;
+    }
+
     .source {
       margin-top: auto;
-      padding-top: 18px;
       font-size: 11px;
       line-height: 1.45;
       color: #2E5C73;
@@ -146,11 +220,12 @@
     }
 
     .chart-card {
+      background: white;
       min-height: 520px;
-      padding: 22px 22px 18px;
+      padding: 22px;
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 18px;
     }
 
     .chart-header {
@@ -165,15 +240,10 @@
       font-weight: 800;
     }
 
-    .chart-subtitle {
-      margin: 0;
-      font-size: 13px;
-      line-height: 1.35;
-      color: #6d8795;
-    }
-
     .chart-stage {
       min-width: 0;
+      display: flex;
+      align-items: center;
       flex: 1 1 auto;
     }
 
@@ -224,31 +294,6 @@
       font-weight: 700;
     }
 
-    .legend {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 12px 24px;
-      margin-top: auto;
-      padding-top: 4px;
-    }
-
-    .legend-item {
-      display: inline-flex;
-      align-items: center;
-      gap: 9px;
-      font-size: 13px;
-      line-height: 1.2;
-      font-weight: 700;
-      color: #2E5C73;
-    }
-
-    .legend-swatch {
-      width: 17px;
-      height: 17px;
-      flex: 0 0 17px;
-    }
-
     .tooltip {
       position: absolute;
       background: white;
@@ -287,22 +332,32 @@
 
 <div class="chart-module">
   <aside class="control-panel">
-    <h2 class="panel-title">Select countries</h2>
-
     <div class="control-group">
       <label for="year-select">Year</label>
       <select id="year-select"></select>
     </div>
 
+    <div class="panel-divider"></div>
+
     <div class="control-group">
-      <label for="country-select">Countries</label>
-      <select id="country-select" aria-describedby="country-helper">
-        <option value="">Select up to 10 countries...</option>
-      </select>
+      <label for="country-search">Countries</label>
+      <input id="country-search" type="search" autocomplete="off" placeholder="Search countries..." aria-describedby="country-helper">
+      <div id="country-results" class="country-results"></div>
       <div id="selected-countries" class="selected-list" aria-live="polite"></div>
       <p id="country-helper" class="helper-text">You can select up to 10 countries.</p>
       <p id="selection-status" class="status-text" aria-live="polite"></p>
     </div>
+
+    <div class="panel-divider"></div>
+
+    <div class="legend">
+      <p class="legend-title">Tier consumption benchmarks</p>
+      <p class="legend-subtitle">kWh/person/year</p>
+
+      <ul class="legend-list" id="tier-legend"></ul>
+    </div>
+
+    <div class="panel-divider"></div>
 
     <div class="source">
       Source: <a href="https://openenergymaps.org/" target="_blank" rel="noopener noreferrer">Open Energy Maps</a> / Energy for Growth Hub.
@@ -312,7 +367,6 @@
   <main class="chart-card">
     <div class="chart-header">
       <h1 class="chart-title">Population share at each electricity consumption tier</h1>
-      <p class="chart-subtitle" id="chart-subtitle"></p>
     </div>
 
     <div class="chart-stage">
@@ -320,8 +374,6 @@
         <title id="chart-title-desc">Population share at each electricity consumption tier</title>
       </svg>
     </div>
-
-    <div class="legend" id="tier-legend"></div>
   </main>
 </div>
 
