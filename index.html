@@ -14,19 +14,22 @@
     body {
       font-family: Arial, sans-serif;
       margin: 0;
-      overflow-x: hidden;
+      overflow: hidden;
       background: #f3f7f9;
       color: #2E5C73;
     }
 
     .chart-module {
       width: min(100%, 1180px);
+      max-height: 100vh;
       margin: 0 auto;
       padding: 12px 8px;
       display: grid;
       grid-template-columns: 260px minmax(0, 1fr);
       gap: 12px;
-      align-items: stretch;
+      align-items: start;
+      overflow-y: auto;
+      overflow-x: hidden;
     }
 
     .control-panel,
@@ -39,10 +42,11 @@
 
     .control-panel {
       background: #f3f7f9;
-      min-height: 520px;
       padding: 20px 18px;
       display: flex;
       flex-direction: column;
+      max-height: calc(100vh - 24px);
+      overflow-y: auto;
     }
 
     .control-group {
@@ -78,13 +82,16 @@
     }
 
     .country-results {
-      display: grid;
+      display: none;
       align-content: start;
       gap: 4px;
-      min-height: 154px;
       max-height: 154px;
       overflow-y: auto;
       padding-right: 2px;
+    }
+
+    .country-results.is-visible {
+      display: grid;
     }
 
     .country-option-button {
@@ -124,15 +131,14 @@
       align-content: start;
       gap: 6px;
       margin: 10px 0 8px;
-      min-height: 354px;
     }
 
     .country-chip {
       width: 100%;
       min-height: 30px;
-      display: flex;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
       align-items: center;
-      justify-content: space-between;
       gap: 8px;
       padding: 5px 8px;
       color: #2E5C73;
@@ -221,7 +227,6 @@
 
     .chart-card {
       background: white;
-      min-height: 520px;
       padding: 22px;
       display: flex;
       flex-direction: column;
@@ -243,8 +248,8 @@
     .chart-stage {
       min-width: 0;
       display: flex;
-      align-items: center;
-      flex: 1 1 auto;
+      align-items: flex-start;
+      flex: 0 0 auto;
     }
 
     svg {
