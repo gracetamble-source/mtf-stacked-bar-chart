@@ -2,89 +2,329 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>MTF Tier Distribution</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Population share at each electricity consumption tier</title>
   <script src="https://d3js.org/d3.v7.min.js"></script>
 
   <style>
+    * {
+      box-sizing: border-box;
+    }
 
-  body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    background: white;
-    color: #2E5C73;
-  }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      overflow-x: hidden;
+      background: #f3f7f9;
+      color: #2E5C73;
+    }
 
-  svg {
-    width: 100%;
-    max-width: 1100px;
-    height: 650px;
-    display: block;
-  }
+    .chart-module {
+      width: min(100%, 1180px);
+      margin: 0 auto;
+      padding: 12px 8px;
+      display: grid;
+      grid-template-columns: 260px minmax(0, 1fr);
+      gap: 12px;
+      align-items: stretch;
+    }
 
-  .axis text {
-    font-size: 13px;
-    fill: #2E5C73;
-  }
+    .control-panel,
+    .chart-card {
+      background: white;
+      border: 1px solid #e1ebef;
+      border-radius: 8px;
+      color: #2E5C73;
+      min-width: 0;
+    }
 
-  .x-axis path {
-    stroke: #2E5C73;
-    stroke-width: 1;
-  }
+    .control-panel {
+      min-height: 520px;
+      padding: 20px 18px;
+      display: flex;
+      flex-direction: column;
+    }
 
-  .x-axis line {
-    stroke: #2E5C73;
-    stroke-width: 1;
-  }
+    .panel-title {
+      margin: 0 0 18px;
+      font-size: 20px;
+      line-height: 1.15;
+      font-weight: 800;
+    }
 
-  .y-axis path,
-  .y-axis line {
-    display: none;
-  }
+    .control-group {
+      display: grid;
+      gap: 7px;
+      margin-bottom: 14px;
+    }
 
-  .country-label {
-    font-size: 18px;
-    fill: #2E5C73;
-    font-weight: 500;
-  }
+    label {
+      font-size: 13px;
+      font-weight: 700;
+    }
 
-  .tier-segment {
-    cursor: pointer;
-  }
+    select {
+      width: 100%;
+      min-height: 36px;
+      padding: 7px 10px;
+      font-size: 14px;
+      color: #2E5C73;
+      border: 1px solid #b7c6cc;
+      border-radius: 4px;
+      background: white;
+    }
 
-  .tier-segment:hover {
-    opacity: 0.85;
-  }
+    select:disabled {
+      color: #8299a4;
+      background: #f7fafb;
+    }
 
-  .axis-label {
-    font-size: 16px;
-    font-style: italic;
-    fill: #2E5C73;
-  }
+    .helper-text,
+    .status-text {
+      margin: 0;
+      font-size: 12px;
+      line-height: 1.35;
+      color: #527487;
+    }
 
-  .legend text {
-    font-size: 16px;
-    fill: #2E5C73;
-    font-weight: 500;
-  }
+    .status-text {
+      min-height: 16px;
+    }
 
-  .tooltip {
-    position: absolute;
-    background: white;
-    border: 1px solid #ccc;
-    padding: 8px 10px;
-    font-size: 13px;
-    pointer-events: none;
-    opacity: 0;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-    color: #2E5C73;
-  }
+    .selected-list {
+      display: grid;
+      gap: 6px;
+      margin: 10px 0 8px;
+    }
 
-</style>
+    .country-chip {
+      width: 100%;
+      min-height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 5px 8px;
+      color: #2E5C73;
+      background: white;
+      border: 1px solid #cbd9df;
+      border-radius: 4px;
+      font-size: 13px;
+      line-height: 1.2;
+    }
+
+    .remove-country {
+      appearance: none;
+      border: 0;
+      background: transparent;
+      color: #2E5C73;
+      width: 20px;
+      height: 20px;
+      padding: 0;
+      font-size: 18px;
+      line-height: 18px;
+      cursor: pointer;
+    }
+
+    .remove-country:focus-visible,
+    select:focus-visible {
+      outline: 2px solid #7ea4b7;
+      outline-offset: 2px;
+    }
+
+    .source {
+      margin-top: auto;
+      padding-top: 18px;
+      font-size: 11px;
+      line-height: 1.45;
+      color: #2E5C73;
+      text-align: left;
+    }
+
+    .source a {
+      color: #2E5C73;
+    }
+
+    .chart-card {
+      min-height: 520px;
+      padding: 22px 22px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .chart-header {
+      display: grid;
+      gap: 6px;
+    }
+
+    .chart-title {
+      margin: 0;
+      font-size: 22px;
+      line-height: 1.2;
+      font-weight: 800;
+    }
+
+    .chart-subtitle {
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.35;
+      color: #6d8795;
+    }
+
+    .chart-stage {
+      min-width: 0;
+      flex: 1 1 auto;
+    }
+
+    svg {
+      width: 100%;
+      height: auto;
+      display: block;
+      overflow: visible;
+    }
+
+    .axis text,
+    .country-label {
+      fill: #2E5C73;
+    }
+
+    .axis text {
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .x-axis path,
+    .x-axis line {
+      stroke: #9fb3bd;
+      stroke-width: 1;
+    }
+
+    .y-axis path,
+    .y-axis line {
+      display: none;
+    }
+
+    .country-label {
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .tier-segment {
+      cursor: pointer;
+    }
+
+    .tier-segment:hover {
+      opacity: 0.86;
+    }
+
+    .no-data-message {
+      fill: #527487;
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px 24px;
+      margin-top: auto;
+      padding-top: 4px;
+    }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      font-size: 13px;
+      line-height: 1.2;
+      font-weight: 700;
+      color: #2E5C73;
+    }
+
+    .legend-swatch {
+      width: 17px;
+      height: 17px;
+      flex: 0 0 17px;
+    }
+
+    .tooltip {
+      position: absolute;
+      background: white;
+      border: 1px solid #cbd9df;
+      border-radius: 4px;
+      padding: 8px 10px;
+      font-size: 13px;
+      pointer-events: none;
+      opacity: 0;
+      box-shadow: 0 2px 8px rgba(46, 92, 115, 0.18);
+      color: #2E5C73;
+    }
+
+    @media (max-width: 820px) {
+      .chart-module {
+        grid-template-columns: 1fr;
+      }
+
+      .control-panel,
+      .chart-card {
+        min-height: 0;
+      }
+
+      .source {
+        margin-top: 0;
+      }
+
+      .chart-card {
+        padding: 18px 14px 16px;
+      }
+    }
+  </style>
 </head>
 
 <body>
 
-<svg width="1100" height="650"></svg>
+<div class="chart-module">
+  <aside class="control-panel">
+    <h2 class="panel-title">Select countries</h2>
+
+    <div class="control-group">
+      <label for="year-select">Year</label>
+      <select id="year-select"></select>
+    </div>
+
+    <div class="control-group">
+      <label for="country-select">Countries</label>
+      <select id="country-select" aria-describedby="country-helper">
+        <option value="">Select up to 10 countries...</option>
+      </select>
+      <div id="selected-countries" class="selected-list" aria-live="polite"></div>
+      <p id="country-helper" class="helper-text">You can select up to 10 countries.</p>
+      <p id="selection-status" class="status-text" aria-live="polite"></p>
+    </div>
+
+    <div class="source">
+      Source: <a href="https://openenergymaps.org/" target="_blank" rel="noopener noreferrer">Open Energy Maps</a> / Energy for Growth Hub.
+    </div>
+  </aside>
+
+  <main class="chart-card">
+    <div class="chart-header">
+      <h1 class="chart-title">Population share at each electricity consumption tier</h1>
+      <p class="chart-subtitle" id="chart-subtitle"></p>
+    </div>
+
+    <div class="chart-stage">
+      <svg id="stacked-bar-chart" role="img" aria-labelledby="chart-title-desc">
+        <title id="chart-title-desc">Population share at each electricity consumption tier</title>
+      </svg>
+    </div>
+
+    <div class="legend" id="tier-legend"></div>
+  </main>
+</div>
+
 <div class="tooltip"></div>
 
 <script src="script.js"></script>
